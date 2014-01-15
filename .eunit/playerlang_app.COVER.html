@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<title>.eunit/playerlang_app.COVER.html</title>
+</head><body style='background-color: white; color: black'>
+<pre>
+File generated from /Users/code0100fun/Projects/erlang/playerlang/.eunit/playerlang_app.erl by COVER 2014-01-15 at 14:19:45
+
+****************************************************************************
+
+        |  -module(playerlang_app).
+        |  
+        |  -behaviour(application).
+        |  
+        |  -define(PLAYERLANG_LIB, "playerlang").
+        |  
+        |  %% Application callbacks
+        |  -export([start/2, stop/1]).
+        |  
+        |  -ifdef(TEST).
+        |  -include_lib("eunit/include/eunit.hrl").
+        |  -endif.
+        |  
+        |  %% ===================================================================
+        |  %% Application callbacks
+        |  %% ===================================================================
+        |  
+        |  start(_StartType, _StartArgs) -&gt;
+     1..|      case erl_ddll:load_driver("../ebin", playerlang_drv) of
+     1..|          ok -&gt; ok;
+<font color=red>     0..|          {error, already_loaded} -&gt; ok;</font>
+<font color=red>     0..|          {error, Message} -&gt; exit(erl_ddll:format_error(Message))</font>
+        |      end,
+        |      % spawn(?MODULE, init, [?PLAYERLANG_LIB]),
+     1..|      playerlang_sup:start_link().
+        |  
+        |  % init() -&gt;
+        |  %     % register(play, self()),
+        |  %     % Port = open_port({spawn, ?PLAYERLANG_LIB}, [])
+        |  %     ok.
+        |  
+        |  stop(_State) -&gt;
+<font color=red>     0..|      ok.</font>
+        |  
+        |  -ifdef(TEST).
+        |  
+        |  simple_test() -&gt;
+     1..|          ok = application:start(playerlang),
+     1..|              ?assertNot(undefined == whereis(playerlang_sup)).
+        |  
+        |  -endif.
+</pre>
+</body>
+</html>

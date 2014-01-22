@@ -15,6 +15,12 @@ EI_LIBS     = -L/usr/local/lib/erlang/lib/erl_interface-3.7.15/lib \
               -lei \
               -lerl_interface
 
+ifeq ($(OS), Darwin)
+  EI_LIBS  += -framework OpenAL
+else
+  EI_LIBS  += -lopenal
+endif
+
 TARGET_LIB = playerlang_drv.so
 ifeq ($(OS), Darwin)
   EXTRA_OPTIONS = -fno-common -bundle -undefined suppress -flat_namespace

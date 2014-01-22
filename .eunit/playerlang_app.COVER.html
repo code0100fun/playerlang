@@ -5,7 +5,7 @@
 <title>.eunit/playerlang_app.COVER.html</title>
 </head><body style='background-color: white; color: black'>
 <pre>
-File generated from /Users/code0100fun/Projects/erlang/playerlang/.eunit/playerlang_app.erl by COVER 2014-01-15 at 14:19:45
+File generated from /Users/code0100fun/Projects/erlang/playerlang/.eunit/playerlang_app.erl by COVER 2014-01-17 at 16:19:04
 
 ****************************************************************************
 
@@ -13,41 +13,38 @@ File generated from /Users/code0100fun/Projects/erlang/playerlang/.eunit/playerl
         |  
         |  -behaviour(application).
         |  
-        |  -define(PLAYERLANG_LIB, "playerlang").
+        |  -define(PLAYERLANG_LIB, playerlang_drv).
+        |  -define(CMD_PLAY, 2).
         |  
-        |  %% Application callbacks
-        |  -export([start/2, stop/1]).
+        |  -export([start/2, stop/0, play/0]).
         |  
         |  -ifdef(TEST).
         |  -include_lib("eunit/include/eunit.hrl").
         |  -endif.
         |  
-        |  %% ===================================================================
-        |  %% Application callbacks
-        |  %% ===================================================================
-        |  
         |  start(_StartType, _StartArgs) -&gt;
-     1..|      case erl_ddll:load_driver("../ebin", playerlang_drv) of
-     1..|          ok -&gt; ok;
-<font color=red>     0..|          {error, already_loaded} -&gt; ok;</font>
+     1..|      case erl_ddll:load_driver("../ebin", ?PLAYERLANG_LIB) of
+        |          ok -&gt;
+     1..|              Port = open_port({spawn, ?PLAYERLANG_LIB}, []),
+     1..|              register(?PLAYERLANG_LIB, Port);
+        |          {error, already_loaded} -&gt;
+<font color=red>     0..|              ok;</font>
 <font color=red>     0..|          {error, Message} -&gt; exit(erl_ddll:format_error(Message))</font>
         |      end,
-        |      % spawn(?MODULE, init, [?PLAYERLANG_LIB]),
      1..|      playerlang_sup:start_link().
         |  
-        |  % init() -&gt;
-        |  %     % register(play, self()),
-        |  %     % Port = open_port({spawn, ?PLAYERLANG_LIB}, [])
-        |  %     ok.
-        |  
-        |  stop(_State) -&gt;
+        |  stop() -&gt;
 <font color=red>     0..|      ok.</font>
+        |  
+        |  play() -&gt;
+     1..|      port_control(?PLAYERLANG_LIB, 2, ""),
+     1..|      ok.
         |  
         |  -ifdef(TEST).
         |  
-        |  simple_test() -&gt;
-     1..|          ok = application:start(playerlang),
-     1..|              ?assertNot(undefined == whereis(playerlang_sup)).
+        |  play_test() -&gt;
+     1..|      application:start(playerlang),
+     1..|      play().
         |  
         |  -endif.
 </pre>

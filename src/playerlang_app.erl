@@ -2,40 +2,37 @@
 
 -behaviour(application).
 
--define(PLAYERLANG_LIB, "playerlang").
+-define(PLAYERLANG_LIB, playerlang_drv).
+-define(CMD_PLAY, 2).
 
-%% Application callbacks
--export([start/2, stop/1]).
+-export([start/2, stop/0, play/0]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
-%% ===================================================================
-%% Application callbacks
-%% ===================================================================
-
 start(_StartType, _StartArgs) ->
-    case erl_ddll:load_driver("../ebin", playerlang_drv) of
-        ok -> ok;
-        {error, already_loaded} -> ok;
+    case erl_ddll:load_driver("../ebin", ?PLAYERLANG_LIB) of
+        ok ->
+            Port = open_port({spawn, ?PLAYERLANG_LIB}, []),
+            register(?PLAYERLANG_LIB, Port);
+        {error, already_loaded} ->
+            ok;
         {error, Message} -> exit(erl_ddll:format_error(Message))
     end,
-    % spawn(?MODULE, init, [?PLAYERLANG_LIB]),
     playerlang_sup:start_link().
 
-% init() ->
-%     % register(play, self()),
-%     % Port = open_port({spawn, ?PLAYERLANG_LIB}, [])
-%     ok.
+stop() ->
+    ok.
 
-stop(_State) ->
+play() ->
+    port_control(?PLAYERLANG_LIB, 2, ""),
     ok.
 
 -ifdef(TEST).
 
-simple_test() ->
-        ok = application:start(playerlang),
-            ?assertNot(undefined == whereis(playerlang_sup)).
+play_test() ->
+    application:start(playerlang),
+    play().
 
 -endif.
